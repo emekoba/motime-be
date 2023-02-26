@@ -1,12 +1,21 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const app = express();
+const movieRoutes = require("./routes/movie.routes");
+require("dotenv").config();
+const startdbConnection = require("./config/db.conifg");
+const { seedMovies } = require("./seeders/movies.seeder");
+const { PORT } = process.env;
 
-const port = 1300;
+startdbConnection();
 
-app.listen(port, async () => {
-	console.log(`listening on port ${port}`);
+app.use("/movies", movieRoutes);
+
+mongoose.connection.once("open", () => {
+	console.log("db conection successful");
+	seedMovies();
+
+	app.listen(PORT, async () => {
+		console.log(`listening on port ${PORT}`);
+	});
 });
-
-module.exports = {
-	server: app,
-};
