@@ -5,52 +5,38 @@ async function createMovie(payload) {
 	const { title, imageUrl } = payload;
 
 	try {
-		let movie = new movieModel({
-			title,
-			imageUrl,
+		let movieDoc = new movieModel({
+			title: mov["title"],
+			poster: mov["poster"],
 		});
 
-		movie = await movie.save();
+		movieDoc = await movieDoc.save();
 
-		console.log("movie created", movie);
-
-		return movie;
+		console.log("movie created", movieDoc);
+		return movieDoc;
 	} catch (e) {
 		throw new Error("db query error: create movie: " + e);
 	}
 }
 
-async function findMovies(query) {
-	let movies;
-
+async function getCatalogues() {
 	try {
-		movies = await movieModel.find({ title: { $regex: ".*" + query + ".*" } });
+		return await movieModel.find();
+	} catch (e) {
+		throw new Error("db query error: get catalogues " + e);
+	}
+}
+
+async function findMovies(query, order) {
+	try {
+		return await movieModel.find({ title: { $regex: ".*" + query + ".*" } });
 	} catch (e) {
 		throw new Error("db query error: find movie " + e);
 	}
-
-	return movies;
 }
-
-async function getMovieById(id) {
-	let movie;
-
-	try {
-		movie = await movieModel.findById(id).exec();
-	} catch (e) {
-		throw new Error("db query error: fetch movie by id");
-	}
-
-	console.log("movie", movie);
-
-	if (!movie) {
-		throw new Error("could not find movie of id provided");
-	}
-}
-
-async function getAllMovies() {}
 
 module.exports = {
+	createMovie,
 	findMovies,
-	getMovieById,
+	getCatalogues,
 };
