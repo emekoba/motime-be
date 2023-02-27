@@ -35,14 +35,12 @@ async function seedMovies() {
 					movieDoc = await movieDoc.save();
 
 					if (movieDoc) {
-						catalogueModel.findByIdAndUpdate(
+						await catalogueModel.findByIdAndUpdate(
 							catalogueDoc._id,
 							{
 								$push: {
 									movies: {
 										_id: movieDoc._id,
-										title: movieDoc.title,
-										poster: movieDoc.poster,
 									},
 								},
 							},

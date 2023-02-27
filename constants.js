@@ -13,6 +13,9 @@ const movieList = [
 	},
 ];
 
+const orderTypes = ["ASC", "DESC"];
+
 module.exports = {
 	movieList,
+	orderTypes,
 };
