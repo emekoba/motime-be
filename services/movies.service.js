@@ -1,13 +1,43 @@
 require("dotenv").config();
 const movieModel = require("../models/movie");
 
-async function getMovie(id) {
+async function createMovie(payload) {
+	const { title, imageUrl } = payload;
+
+	try {
+		let movie = new movieModel({
+			title,
+			imageUrl,
+		});
+
+		movie = await movie.save();
+
+		console.log("movie created", movie);
+
+		return movie;
+	} catch (e) {
+		throw new Error("db query error: create movie: " + e);
+	}
+}
+
+async function findMovies(query) {
+	let movies;
+
+	try {
+		movies = await movieModel.find({ title: { $regex: ".*" + query + ".*" } });
+	} catch (e) {
+		throw new Error("db query error: find movie " + e);
+	}
+
+	return movies;
+}
+
+async function getMovieById(id) {
 	let movie;
 
 	try {
 		movie = await movieModel.findById(id).exec();
 	} catch (e) {
-		Logger.error(e);
 		throw new Error("db query error: fetch movie by id");
 	}
 
@@ -21,6 +51,6 @@ async function getMovie(id) {
 async function getAllMovies() {}
 
 module.exports = {
-	getMovie,
-	getAllMovies,
+	findMovies,
+	getMovieById,
 };

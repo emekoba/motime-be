@@ -1,5 +1,6 @@
 const movieModel = require("../models/movie");
-const movieList = require("../constants");
+const catalogueModel = require("../models/catalogue");
+const { movieList } = require("../constants");
 
 async function seedMovies() {
 	try {
@@ -9,24 +10,51 @@ async function seedMovies() {
 		throw new Error("seedMovies: db query error: fetch movie by id");
 	}
 
-	console.log("movie", movie);
-
 	if (!movie) {
+		let catalogueDoc;
+
 		try {
-			// movieModel.insertMany(movieList).then(() => {
-			console.log("movies seeded successfully..🍿🍿🍿🍿");
-			// });
-
-			// movieModel.save(movie);
-
-			const bruh = new movieModel({
-				name: "Fincra",
+			catalogueDoc = new catalogueModel({
+				name: "all movies",
+				default: true,
 			});
 
-			await bruh.save();
+			catalogueDoc = await catalogueDoc.save();
 		} catch (e) {
-			Logger.error(e);
-			throw new Error("seedMovies: db query error: insert many");
+			throw new Error("seedMovies: db query error: create catalogue" + e);
+		}
+
+		try {
+			Promise.all(
+				movieList.map(async (mov) => {
+					let movieDoc = new movieModel({
+						title: mov["title"],
+						poster: mov["poster"],
+					});
+
+					movieDoc = await movieDoc.save();
+
+					if (movieDoc) {
+						catalogueModel.findByIdAndUpdate(
+							catalogueDoc._id,
+							{
+								$push: {
+									movies: {
+										_id: movieDoc._id,
+										title: movieDoc.title,
+										poster: movieDoc.poster,
+									},
+								},
+							},
+							{ new: true, useFindAndModify: false }
+						);
+					}
+				})
+			).then((res) => {
+				console.log("movies seeded successfully..🍿🍿🍿🍿");
+			});
+		} catch (e) {
+			throw new Error("seedMovies: db query error: insert many" + e);
 		}
 	}
 }

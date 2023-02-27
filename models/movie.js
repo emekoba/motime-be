@@ -4,9 +4,9 @@ const CatalogueSchema = require("./catalogue");
 
 const MovieSchema = new Schema(
 	{
-		name: { type: String, required: true },
-		images: [{ type: String }],
-		catalogue: CatalogueSchema.schema,
+		title: { type: String, required: true },
+		poster: { type: String },
+		catalogue: { type: Schema.Types.ObjectId, ref: "Catalogue" },
 	},
 	{ timestamps: true }
 );
