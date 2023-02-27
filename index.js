@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const mongoose = require("mongoose");
 const app = express();
 const movieRoutes = require("./routes/movie.routes");
@@ -9,6 +10,7 @@ const { PORT } = process.env;
 
 startdbConnection();
 
+app.use(cors());
 app.use("/movies", movieRoutes);
 
 mongoose.connection.once("open", () => {

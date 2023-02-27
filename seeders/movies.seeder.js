@@ -41,6 +41,8 @@ async function seedMovies() {
 								$push: {
 									movies: {
 										_id: movieDoc._id,
+										title: movieDoc.title,
+										poster: movieDoc.poster,
 									},
 								},
 							},
