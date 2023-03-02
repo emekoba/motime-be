@@ -21,19 +21,4 @@ router.post("/create", async (req, res) => {
 	res.status(201).send(await movieService.createMovie(req.body));
 });
 
-// router.patch("/to-catalogue/:movieId", async (req, res) => {
-// 	console.log("add movie to catalogue route called....", req.params);
-// 	res.status(200).send(await movieService.addMovieToCatalogue(req.params));
-// });
-
-// router.patch("/from-catalogue/:movieId", async (req, res) => {
-// 	console.log("remove movie to catalogue route called....", req.params);
-// 	res.status(200).send(await movieService.removeMovieFromCatalogue(req.params));
-// });
-
-// router.get("/catalogue", async (req, res) => {
-// 	console.log("get catalogue route called....");
-// 	res.status(200).send(await movieService.getMyCatalogue());
-// });
-
 module.exports = router;

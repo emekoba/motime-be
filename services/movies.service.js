@@ -9,10 +9,10 @@ async function createMovie(payload) {
 
 	try {
 		let movieDoc = new movieModel({
-			title,
-			genre,
-			poster,
-			snyopsis,
+			title: title ?? "",
+			genre: genre ?? "",
+			poster: poster ?? "",
+			snyopsis: snyopsis ?? "",
 		});
 
 		movieDoc = await movieDoc.save();
@@ -92,26 +92,6 @@ async function removeMovieFromCatalogue(movieId) {
 }
 
 async function getMyCatalogue() {
-	let catalogueDoc;
-
-	// try {
-	// 	catalogueDoc = new catalogueModel({
-	// 		name: "all movies",
-	// 		default: true,
-	// 	});
-
-	// 	catalogueDoc = await catalogueDoc.save();
-
-	// catalogueDoc = new catalogueModel({
-	// 	name: "your movies",
-	// 	default: true,
-	// });
-
-	// 	catalogueDoc = await catalogueDoc.save();
-	// } catch (e) {
-	// 	throw new Error("seedMovies: db query error: create catalogue" + e);
-	// }
-
 	try {
 		return await catalogueModel.findOne({
 			catalogue: { name: "your catalogue" },

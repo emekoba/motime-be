@@ -1,7 +1,6 @@
 const movieModel = require("../models/movie");
 const catalogueModel = require("../models/catalogue");
 const { movieList } = require("../constants");
-const generateRandomHash = require("./../helpers/helpers");
 
 async function seedMovies() {
 	try {
@@ -30,8 +29,10 @@ async function seedMovies() {
 			Promise.all(
 				movieList.map(async (mov, i) => {
 					let movieDoc = new movieModel({
-						title: mov["title"],
-						poster: mov["poster"],
+						title: mov["title"] ?? "",
+						genre: mov["genre"] ?? "",
+						synopsis: mov["synopsis"] ?? "",
+						poster: mov["poster"] ?? "",
 					});
 
 					movieDoc = await movieDoc.save();
@@ -45,6 +46,7 @@ async function seedMovies() {
 										_id: movieDoc._id,
 										title: movieDoc.title,
 										poster: movieDoc.poster,
+										genre: movieDoc.genre,
 										synopsis: movieDoc.synopsis,
 									},
 								},

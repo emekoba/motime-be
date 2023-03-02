@@ -29,12 +29,13 @@ app.use("/movies", movieRoutes);
 app.use("/catalogue", catalogueRoutes);
 
 mongoose.connection.once("open", () => {
-	console.log("db conection successful");
-	// seedMovies();
-
-	app.listen(PORT, async () => {
-		console.log(`listening on port ${PORT}`);
-	});
+	if (process.env.NODE_ENV !== "test") {
+		console.log("db conection successful");
+		seedMovies();
+		app.listen(PORT, async () => {
+			console.log(`listening on port ${PORT}`);
+		});
+	}
 });
 
 module.exports = app;
