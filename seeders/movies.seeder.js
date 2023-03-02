@@ -1,32 +1,34 @@
 const movieModel = require("../models/movie");
 const catalogueModel = require("../models/catalogue");
 const { movieList } = require("../constants");
+const generateRandomHash = require("./../helpers/helpers");
 
 async function seedMovies() {
 	try {
 		movie = await movieModel.findOne().exec();
+		catalogue = await catalogueModel.findOne().exec();
 	} catch (e) {
-		Logger.error(e);
 		throw new Error("seedMovies: db query error: fetch movie by id");
 	}
 
-	if (!movie) {
-		let catalogueDoc;
-
+	if (!catalogue) {
 		try {
 			catalogueDoc = new catalogueModel({
-				name: "all movies",
+				name: "your movies",
 				default: true,
 			});
 
-			catalogueDoc = await catalogueDoc.save();
+			await catalogueDoc.save();
+			console.log("catalogues seeded successfully..📔📔📔📔");
 		} catch (e) {
-			throw new Error("seedMovies: db query error: create catalogue" + e);
+			throw new Error("seedMovies: db query error: seed catalogue" + e);
 		}
+	}
 
+	if (!movie) {
 		try {
 			Promise.all(
-				movieList.map(async (mov) => {
+				movieList.map(async (mov, i) => {
 					let movieDoc = new movieModel({
 						title: mov["title"],
 						poster: mov["poster"],
@@ -34,7 +36,7 @@ async function seedMovies() {
 
 					movieDoc = await movieDoc.save();
 
-					if (movieDoc) {
+					if (i == 0) {
 						await catalogueModel.findByIdAndUpdate(
 							catalogueDoc._id,
 							{
@@ -43,6 +45,7 @@ async function seedMovies() {
 										_id: movieDoc._id,
 										title: movieDoc.title,
 										poster: movieDoc.poster,
+										synopsis: movieDoc.synopsis,
 									},
 								},
 							},

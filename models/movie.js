@@ -5,7 +5,8 @@ const MovieSchema = new Schema(
 	{
 		title: { type: String, required: true },
 		poster: { type: String },
-		catalogue: { type: Schema.Types.ObjectId, ref: "Catalogue" },
+		genre: { type: String },
+		synopsis: { type: String },
 	},
 	{ timestamps: true }
 );

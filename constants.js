@@ -13,9 +13,9 @@ const movieList = [
 	},
 ];
 
-const orderTypes = ["ASC", "DESC"];
+const sortTypes = ["ASC", "DESC"];
 
 module.exports = {
 	movieList,
-	orderTypes,
+	sortTypes,
 };

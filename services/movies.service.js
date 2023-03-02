@@ -1,13 +1,18 @@
 require("dotenv").config();
+const generateRandomHash = require("./../helpers/helpers");
+const catalogueModel = require("../models/catalogue");
 const movieModel = require("../models/movie");
+const mongoose = require("mongoose");
 
 async function createMovie(payload) {
-	const { title, imageUrl } = payload;
+	const { title, poster, genre, snyopsis } = payload;
 
 	try {
 		let movieDoc = new movieModel({
-			title: mov["title"],
-			poster: mov["poster"],
+			title,
+			genre,
+			poster,
+			snyopsis,
 		});
 
 		movieDoc = await movieDoc.save();
@@ -19,17 +24,123 @@ async function createMovie(payload) {
 	}
 }
 
-async function getCatalogues() {
+async function addMovieToCatalogue(movieId) {
+	let movie, movieDoc;
+
 	try {
-		return await movieModel.find();
+		movie = await movieModel
+			.findOne({ _id: mongoose.Types.ObjectId(movieId) })
+			.exec();
+	} catch (e) {
+		throw new Error(
+			"add mov to cat err: db query error: fetch movie by id" + e
+		);
+	}
+
+	if (!movie) {
+		throw new Error("add mov to cat err: no movie with matching id");
+	}
+
+	try {
+		await catalogueModel.findAndUpdate(
+			{ name: "your catalogue" },
+			{
+				$push: {
+					movies: {
+						_id: movieDoc._id,
+						title: movieDoc.title,
+						poster: movieDoc.poster,
+					},
+				},
+			},
+			{ new: true, useFindAndModify: false }
+		);
+	} catch (e) {
+		throw new Error("add mov to cat err: db query: update catalogue " + e);
+	}
+}
+
+async function removeMovieFromCatalogue(movieId) {
+	let movieDoc;
+
+	try {
+		movieDoc = await movieModel.findOne({ _id: movieId["movieId"] }).exec();
+	} catch (e) {
+		throw new Error(
+			"add mov to cat err: db query error: fetch movie by id" + e
+		);
+	}
+
+	if (!movieDoc) {
+		throw new Error("add mov to cat err: no movie with matching id:" + movieId);
+	}
+
+	try {
+		await catalogueModel.findOneAndUpdate(
+			{ name: "your catalogue" },
+			{
+				$pull: {
+					movies: {
+						_id: movieId["movieId"],
+					},
+				},
+			}
+		);
+	} catch (e) {
+		throw new Error("add mov to cat err: db query: update catalogue " + e);
+	}
+}
+
+async function getMyCatalogue() {
+	let catalogueDoc;
+
+	// try {
+	// 	catalogueDoc = new catalogueModel({
+	// 		name: "all movies",
+	// 		default: true,
+	// 	});
+
+	// 	catalogueDoc = await catalogueDoc.save();
+
+	// catalogueDoc = new catalogueModel({
+	// 	name: "your movies",
+	// 	default: true,
+	// });
+
+	// 	catalogueDoc = await catalogueDoc.save();
+	// } catch (e) {
+	// 	throw new Error("seedMovies: db query error: create catalogue" + e);
+	// }
+
+	try {
+		return await catalogueModel.findOne({
+			catalogue: { name: "your catalogue" },
+		});
 	} catch (e) {
 		throw new Error("db query error: get catalogues " + e);
 	}
 }
 
-async function findMovies(query, order) {
+async function findMovies(query, sort) {
+	let movies;
+
+	const resolution =
+		query?.length >= 1
+			? {
+					title: {
+						$regex: query,
+						$options: "i",
+					},
+			  }
+			: null;
+
 	try {
-		return await movieModel.find({ title: { $regex: ".*" + query + ".*" } });
+		if (sort) {
+			movies = await movieModel.find(resolution).sort({ title: sort });
+		} else {
+			movies = await movieModel.find(resolution);
+		}
+		return movies;
 	} catch (e) {
 		throw new Error("db query error: find movie " + e);
 	}
@@ -38,5 +149,7 @@ async function findMovies(query, order) {
 module.exports = {
 	createMovie,
 	findMovies,
-	getCatalogues,
+	getMyCatalogue,
+	addMovieToCatalogue,
+	removeMovieFromCatalogue,
 };
